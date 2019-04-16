@@ -1,0 +1,10 @@
+---
+bash_exporter_version: 2.0.0
+bash_exporter_web_listen_address: '0.0.0.0:9300'
+bash_exporter_interval_int: 300
+bash_exporter_prefix_string: 'bash'
+
+#bash_exporter_config_file_template: bash-exporter.yml.j2
+#bash_exporter_config_file: bash-exporter.yml
+bash_exporter_config_dir: /etc/bash-exporter
+bash_exporter_script_dir_name: scripts

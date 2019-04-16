@@ -1,0 +1,21 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=Prometheus Bash Exporter
+After=network.target
+
+[Service]
+Type=simple
+User={{ __bash_exporter_user }}
+Group={{ __bash_exporter_group }}
+ExecStart=/usr/local/bin/bash-exporter \
+    -prefix {{ bash_exporter_prefix_string }} \
+    -interval {{  bash_exporter_interval_int  }} \
+    -web.listen-address {{bash_exporter_web_listen_address }} \
+    -path {{  bash_exporter_config_dir  }}/{{  bash_exporter_script_dir_name  }}
+
+SyslogIdentifier=bash-exporter
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

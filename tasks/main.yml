@@ -1,0 +1,105 @@
+---
+- include: preflight.yml
+
+- name: Create the Bash Exporter group
+  become: true
+  group:
+    name: "{{ __bash_exporter_group }}"
+    state: present
+    system: true
+
+- name: Create the Bash Exporter user
+  become: true
+  user:
+    name: "{{ __bash_exporter_user }}"
+    groups: "{{ __bash_exporter_group }}"
+    append: true
+    shell: /usr/sbin/nologin
+    system: true
+    createhome: false
+    home: /
+
+- name: Create Bash Exporter configuration directory
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: "{{ __bash_exporter_group }}"
+    mode: 0770
+  with_items:
+    - "{{ bash_exporter_config_dir }}"
+    - "{{ bash_exporter_config_dir }}/{{ bash_exporter_script_dir_name }}"
+
+- name: Download bash_exporter binary to local folder
+  get_url:
+    url: "https://github.com/gree-gorey/bash-exporter/releases/download/{{ bash_exporter_version }}/bash-exporter-linux"
+    dest: "/tmp/bash-exporter-linux"
+#    checksum: "sha256:{{ __bash_exporter_checksum }}"
+  register: _download_binary
+  until: _download_binary is succeeded
+  retries: 5
+  delay: 2
+  delegate_to: localhost
+  check_mode: false
+
+- name: Propagate bash-exporter binaries
+  become: true
+  copy:
+    src: "/tmp/bash-exporter-linux"
+    dest: "/usr/local/bin/bash-exporter"
+    mode: 0755
+    owner: root
+    group: root
+  notify:
+    - restart bash exporter
+
+# - name: Configure Bash Exporter
+#   become: true
+# #  template:
+#   copy:
+# #    src: "{{ bash_exporter_config_file_template }}"
+#     src: "{{ bash_exporter_config_file }}"
+#     dest: "{{ bash_exporter_config_dir }}/{{ bash_exporter_config_file }}"
+#     force: true
+#     owner: root
+#     group: "{{ __bash_exporter_group }}"
+#     mode: 0640
+#   notify:
+#     - restart bash exporter
+
+- name: Copy scripts for Bash Exporter
+  become: true
+  copy:
+    src: "{{ item }}"
+    dest: "{{ bash_exporter_config_dir }}/{{ bash_exporter_script_dir_name }}/{{ item }}"
+    force: true
+    owner: root
+    group: "{{ __bash_exporter_group }}"
+    mode: 0750
+  with_items:
+    - script1.sh
+    - script2.sh
+  notify:
+    - restart bash exporter
+
+
+  when: not ansible_check_mode
+- name: Copy the bash-exporter systemd service file
+  become: true
+  template:
+    src: bash-exporter.service.j2
+    dest: /etc/systemd/system/bash-exporter.service
+    owner: root
+    group: root
+    mode: 0644
+  no_log: true
+  notify:
+    - restart bash exporter
+
+- name: Ensure bash-exporter is enabled on boot
+  become: true
+  systemd:
+    name: bash-exporter
+    state: started
+    enabled: true
