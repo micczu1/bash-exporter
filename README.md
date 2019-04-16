@@ -61,5 +61,5 @@ Use it in a playbook as follows:
 
 This project is licensed under Apache2 License. See [LICENSE](/LICENSE) for more details.
 
-This role is inspired by https://github.com/ncabatoff/process-exporter
+This role is inspired by https://github.com/cloudalchemy/ansible-mysqld-exporter
 Bash-exporter is created by https://github.com/gree-gorey/bash-exporter
