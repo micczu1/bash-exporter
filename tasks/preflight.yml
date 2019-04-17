@@ -1,4 +1,5 @@
 ---
+## There is no checksums available
 # - name: "Get checksum for {{ go_arch_map[ansible_architecture] | default(ansible_architecture) }} architecture"
 #   set_fact:
 #     __process_exporter_checksum: "{{ item.split(' ')[0] }}"
