@@ -57,9 +57,7 @@ Use it in a playbook as follows:
     - bash-exporter
 ```
 
-## License
-
-This project is licensed under Apache2 License. See [LICENSE](/LICENSE) for more details.
+## Credits
 
 This role is inspired by https://github.com/cloudalchemy/ansible-mysqld-exporter  
 Bash-exporter is created by https://github.com/gree-gorey/bash-exporter
